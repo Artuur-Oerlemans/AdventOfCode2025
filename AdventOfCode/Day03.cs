@@ -1,18 +1,19 @@
-﻿using System.Text.RegularExpressions;
+﻿using Spectre.Console;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2025;
 
-public class Day00 : BaseDay
+public class Day03 : BaseDay
 {
     private readonly List<string> _input;
-    private readonly Dictionary<(long, long), char> _dict;
+    private readonly Dictionary<(long, long), int> _dict;
     private readonly List<(long, long)> dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)];
     private readonly List<(long, long)> dirsAll = [(1, -1), (-1, -1), (1, 1), (-1, 1), (1, 0), (-1, 0), (0, 1), (0, -1)];
     private readonly List<(long, long)> dirsDiag = [(1, -1), (-1, -1), (1, 1), (-1, 1)];
     private readonly long maxI;
     private readonly long maxJ;
 
-    public Day00()
+    public Day03()
     {
         _input =
         [
@@ -23,31 +24,55 @@ public class Day00 : BaseDay
 ,
         ];
 
-        maxI = _input.Count;
-        maxJ = _input[0].Length;
-        _dict = [];
-        for (int i = 0; i < _input.Count; i++)
-        {
-            for (int j = 0; j < _input[i].Length; j++)
-            {
-                if (_input[i][j] != '.')
-                {
-                    _dict.Add((i, j), _input[i][j]);
-                }
-            }
-        }
 
     }
     public override ValueTask<string> Solve_1()
     {
         long result = 0;
+        for (int i = 0; i < _input.Count; i++)
+        {
+            int maxJolt = 0;
+            for (int jIni = 0; jIni < _input[i].Length; jIni++)
+            {
+                for (int jSec = jIni + 1; jSec < _input[i].Length; jSec++)
+                {
+                    int joltage = int.Parse(_input[i][jIni].ToString() + _input[i][jSec].ToString());
+                    if (joltage > maxJolt)
+                    {
+                        maxJolt = joltage;
+                    }
+                }
+            }
+            result += maxJolt;
+        }
         return new ValueTask<string>($"Solution to {ClassPrefix} {result}, part 1");
     }
 
     public override ValueTask<string> Solve_2()
     {
         long result = 0;
+        for (int i = 0; i < _input.Count; i++)
+        {
+            result += GetMaxJolts("", 12, _input[i]);
+        }
         return new ValueTask<string>($"Solution to {ClassPrefix} {result}, part 2");
+    }
+
+    private long GetMaxJolts(string prefix, int remainingDigits, string remainingString)
+    {
+        if (remainingDigits == 0)
+        {
+            return long.Parse(prefix);
+        }
+        int bestDigit = 0;
+        for (int j = 1; j < remainingString.Length - remainingDigits + 1; j++)
+        {
+            if (int.Parse(remainingString.Substring(j, 1)) > int.Parse(remainingString.Substring(bestDigit, 1)))
+            {
+                bestDigit = j;
+            }
+        }
+        return GetMaxJolts(prefix + remainingString[bestDigit].ToString(), remainingDigits - 1, remainingString.Substring(bestDigit + 1));
     }
 
     private string DictToString(Dictionary<(int, int), char> dict)
