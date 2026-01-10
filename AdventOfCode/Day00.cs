@@ -14,12 +14,15 @@ public class Day00 : BaseDay
 
     public Day00()
     {
+        Regex re = new(@"^move (\d+) to ([A-Z])$");
         _input =
         [
             .. File.ReadAllText(string.Concat(InputFilePath.AsSpan(0, InputFilePath.Length - 4)
 //, "test"
 , ".txt")
                         ).Split("\r\n")
+            //.Select(s => re.Match(s).Groups)
+            //.Select(g => (int.Parse(g[1].Value), g[2].Value))
 ,
         ];
 
@@ -95,19 +98,6 @@ public class Day00 : BaseDay
     private void L(object o)
     {
         Console.WriteLine(o.ToString());
-    }
-
-    private void RegexYouKnow()
-    {
-        string temps =
-@"move 1 to A
-move 2 to B
-move 3 to C";
-        Regex re = new(@"^move (\d) to ([A-Z])$");
-        temps.Split("\r\n")
-            .Select(s => re.Match(s).Groups)
-            .Select(g => (int.Parse(g[1].Value), g[2].Value))
-            .ToList().ForEach(t => Console.WriteLine(t.Value));
     }
 
     private (long, long) Add((long, long) a, (long, long) b)
